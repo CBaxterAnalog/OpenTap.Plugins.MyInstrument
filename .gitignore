@@ -1,0 +1,12 @@
+# Visual Studio caches 
+.vs/
+
+# Builds
+bin/
+
+# Objects (fragments for build)
+obj/
+
+# User files
+*.suo
+.user
