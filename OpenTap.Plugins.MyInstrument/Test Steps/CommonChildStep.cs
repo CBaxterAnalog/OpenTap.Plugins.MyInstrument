@@ -10,7 +10,6 @@ namespace OpenTap.Plugins.MyInstrument
 
     public class CommonChildStep : TestStepBase
     {
-
         public override void Run()
         {
             MyInstrument.CommonChildAction();
