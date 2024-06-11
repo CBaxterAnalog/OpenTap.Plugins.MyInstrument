@@ -13,19 +13,12 @@ namespace OpenTap.Plugins.MyInstrument
         public StepXY()
         {
             _requiredImplementations = new List<Type> { typeof(IX), typeof(IY) };
-
-            AvailableInstruments.Clear();
-            foreach (var instrument in InstrumentSettings.Current)
-            {
-                if (_requiredImplementations.All(item => instrument.GetType().GetInterfaces().Contains(item)))
-                {
-                    AvailableInstruments.Add(instrument as IMyInstrument);
-                }
-            }
         }
 
         public override void Run()
         {
+            RunChildSteps();
+
             (MyInstrument as IX).XAction();
             (MyInstrument as IY).YAction();
         }

@@ -7,20 +7,20 @@ using System.Threading.Tasks;
 namespace OpenTap.Plugins.MyInstrument
 {
     
-    [Display("Common Step", Group: "My Instrument Test Steps", Description: "Do common action")]
+    //[Display("Common Step", Group: "My Instrument Test Steps", Description: "Do common action")]
 
-    public class CommonStep : TestStepBase
-    {
-        public CommonStep()
-        {
-            CommonChildStep commonChildStep = new CommonChildStep() { IsControlledByParent = true };
+    //public class CommonStep : TestStepBase
+    //{
+    //    public CommonStep()
+    //    {
+    //        CommonChildStep commonChildStep = new CommonChildStep() { IsControlledByParent = true };
 
-            ChildTestSteps.Add(commonChildStep);
-        }
+    //        ChildTestSteps.Add(commonChildStep);
+    //    }
         
-        public override void Run()
-        {
-            MyInstrument.CommonAction();
-        }
-    }
+    //    public override void Run()
+    //    {
+    //        MyInstrument.CommonAction();
+    //    }
+    //}
 }

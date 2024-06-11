@@ -22,72 +22,53 @@ namespace OpenTap.Plugins.MyInstrument
         public bool IsControlledByParent { get; set; } = false;
 
         protected List<Type> _requiredImplementations = new List<Type>();
-        private List<IMyInstrument> _availableInstruments = new List<IMyInstrument>();
-        [Browsable(false)]
-        public List<IMyInstrument> AvailableInstruments
+
+        public IEnumerable<IMyInstrument> AvailableInstruments
         {
             get
             {
-                return _availableInstruments;
-            }
-            set
-            {
-                _availableInstruments = value;
-                OnPropertyChanged(nameof(AvailableInstruments));
+                List<IMyInstrument> instrumentsWithAction = new List<IMyInstrument>();
+                foreach (var instrument in InstrumentSettings.Current)
+                {
+                    if (_requiredImplementations.All(item => instrument.GetType().GetInterfaces().Contains(item)))
+                    {
+                        instrumentsWithAction.Add(instrument as IMyInstrument);
+                    }
+                }
+                return instrumentsWithAction;
             }
         }
 
-        private IMyInstrument _myInstrument;
+        protected IMyInstrument _MyInstrument;
         [EnabledIf(nameof(IsControlledByParent), false, HideIfDisabled = false)]
         [Display("MyInstrument", Group: "Instrument Settings", Order: 1, Description: "Select the desired MyInstrument")]
-        [AvailableValues(nameof(AvailableInstruments))]
+        [AvailableValues("AvailableInstruments")]
         public IMyInstrument MyInstrument
         {
-            get { return _myInstrument; }
+            get
+            {
+                return _MyInstrument;
+            }
             set
             {
-                _myInstrument = value;
-                foreach (var childStep in ChildTestSteps)
+                _MyInstrument = value;
+
+                foreach (var a in ChildTestSteps)
                 {
-                    switch (childStep)
+                    if (a is CommonChildStep)
                     {
-                        case CommonChildStep s:
-                            s.MyInstrument = _myInstrument;
-                            break;
-                        default:
-                            break;
+                        (a as CommonChildStep).MyInstrument = this.MyInstrument;
                     }
                 }
             }
         }
 
-        private void OnInstrumentListChanged(object sender, NotifyCollectionChangedEventArgs e)
+        [Browsable(true)]
+        [Display("Add Common Child", Group: "Instrument Settings", Order: 2, Description: "Adds a common child")]
+        public void AddCommonChild()
         {
-            switch (e.Action)
-            {
-                case NotifyCollectionChangedAction.Add:
-                    foreach (var newItem in e.NewItems)
-                    {
-                        if (_requiredImplementations.All(item => newItem.GetType().GetInterfaces().Contains(item)))
-                        {
-                            _availableInstruments.Add(newItem as IMyInstrument);
-                        }
-                    }
-                    break;
-                case NotifyCollectionChangedAction.Remove:
-                    foreach (var oldItem in e.OldItems)
-                    {
-                        _ = _availableInstruments.Remove(oldItem as IMyInstrument);
-                    }
-                    break;
-                default:
-                    break;
-            }
-        }
-
-        public TestStepBase()
-        {
-            InstrumentSettings.Current.CollectionChanged += OnInstrumentListChanged;
+            CommonChildStep commonChildStep = new CommonChildStep() { MyInstrument = this.MyInstrument, IsControlledByParent = true };
+            this.ChildTestSteps.Add(commonChildStep);
         }
     }
 }
